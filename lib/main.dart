@@ -26,33 +26,33 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int navIndex = 0;
   bool processRunning = false;
+  late BuildContext contextG;
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        processRunning = true;
-      });
-      if (!(await FileManager.checkFilePresent("data.txt")) ||
-          DateTime.now().day == 1) {
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Setup(),
-          ),
-        );
-      }
-      // Get data and decode
-      currentFileData = jsonDecode(await FileManager.readFile("data.txt"));
-      setState(() {
-        processRunning = false;
-      });
+    setState(() {
+      processRunning = true;
+    });
+    if (!(await FileManager.checkFilePresent("data.txt")) ||
+        DateTime.now().day == 1) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Setup(),
+        ),
+      );
+    }
+    // Get data and decode
+    currentFileData = jsonDecode(await FileManager.readFile("data.txt"));
+    setState(() {
+      processRunning = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    contextG = context;
     return MaterialApp(
       home: SafeArea(
         child: ModalProgressHUD(
