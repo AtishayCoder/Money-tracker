@@ -37,7 +37,7 @@ class _MainState extends State<Main> {
     if (!(await FileManager.checkFilePresent("data.txt")) ||
         DateTime.now().day == 1) {
       await Navigator.push(
-        context,
+        contextG,
         MaterialPageRoute(
           builder: (context) => Setup(),
         ),
