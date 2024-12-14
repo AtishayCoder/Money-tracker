@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:modal_progress_hud_alt/modal_progress_hud_alt.dart';
 import 'package:money_tracker/data_entry.dart';
 import 'package:money_tracker/file_handler.dart';
@@ -26,25 +27,25 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   int navIndex = 0;
   bool processRunning = false;
-  late BuildContext contextG;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     setState(() {
       processRunning = true;
     });
-    if (!(await FileManager.checkFilePresent("data.txt")) ||
-        DateTime.now().day == 1) {
-      await Navigator.push(
-        contextG,
-        MaterialPageRoute(
-          builder: (context) => Setup(),
-        ),
-      );
-    }
-    // Get data and decode
-    currentFileData = jsonDecode(await FileManager.readFile("data.txt"));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (d) async {
+        if (!(await FileManager.checkFilePresent("data.txt")) ||
+            DateTime.now().day == 1) {
+          await Get.to(
+            Setup(),
+          );
+        }
+        // Get data and decode
+        currentFileData = jsonDecode(await FileManager.readFile("data.txt"));
+      },
+    );
     setState(() {
       processRunning = false;
     });
@@ -52,49 +53,47 @@ class _MainState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
-    contextG = context;
-    return MaterialApp(
+    return GetMaterialApp(
       home: SafeArea(
         child: ModalProgressHUD(
-          inAsyncCall: processRunning,
-          child: Scaffold(
-            body: screens[navIndex],
-            appBar: AppBar(
-              title: Text("Money Tracker"),
-            ),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: navIndex,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.edit_note,
-                    color: Colors.black,
+            inAsyncCall: processRunning,
+            child: Scaffold(
+              body: screens[navIndex],
+              appBar: AppBar(
+                title: Text("Money Tracker"),
+              ),
+              bottomNavigationBar: BottomNavigationBar(
+                currentIndex: navIndex,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.edit_note,
+                      color: Colors.black,
+                    ),
+                    label: "New expense",
                   ),
-                  label: "New expense",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.bar_chart,
-                    color: Colors.black,
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.bar_chart,
+                      color: Colors.black,
+                    ),
+                    label: "Charts",
                   ),
-                  label: "Charts",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.table_chart,
-                    color: Colors.black,
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.table_chart,
+                      color: Colors.black,
+                    ),
+                    label: "Analysis",
                   ),
-                  label: "Analysis",
-                ),
-              ],
-              onTap: (v) {
-                setState(() {
-                  navIndex = v;
-                });
-              },
-            ),
-          ),
-        ),
+                ],
+                onTap: (v) {
+                  setState(() {
+                    navIndex = v;
+                  });
+                },
+              ),
+            )),
       ),
     );
   }
